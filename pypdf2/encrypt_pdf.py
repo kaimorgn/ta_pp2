@@ -3,10 +3,9 @@
 # encrypt_pdf.py
 #
 # [概要]
-#
-#
-#
-#
+# PdfReaderクラスとPdfWriterクラスを使い，
+# 既存のPDFファイルを複製して，
+# 暗号化して保存するプログラム．
 #
 
 import PyPDF2
@@ -28,6 +27,7 @@ input_path = os.path.join(
     INPUT_FILE
 )
 
+# 出力用の相対パスを定義
 output_path = os.path.join(
     OUTPUT_DIR,
     OUTPUT_FILE
