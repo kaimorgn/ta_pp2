@@ -3,10 +3,9 @@
 # merge_pdfs.py
 #
 # [概要]
-#
-#
-#
-#
+# PdfMergerクラスを使い，
+# 3つのPDFファイルを結合して
+# 保存するプログラム．
 #
 
 import PyPDF2
