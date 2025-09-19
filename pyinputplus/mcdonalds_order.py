@@ -3,15 +3,15 @@
 # mcdonalds_order.py
 # 
 # [概要]
-#
-#
-#
-#
+# ハンバーガーチェーン店であるマクドナルドにて
+# 店頭での注文シーンをざっくり再現した
+# プログラム．
 #
 
 import pyinputplus as pyip
 import re
 
+# ハンバーガー名と単品価格を辞書型で定義
 BURGER_PRICES = {
     "ビッグマック": 480,
     "炙り醤油風 ダブル肉厚ビーフ": 580,
@@ -20,6 +20,7 @@ BURGER_PRICES = {
     "チキチー": 250
 }
 
+# サイドメニュー名と単品価格を辞書型で定義
 SIDEMENU_PRICES = {
     "マックフライポテト(M)": 330,
     "チキンマックナゲット(5P)": 290,
@@ -28,6 +29,7 @@ SIDEMENU_PRICES = {
     "シャカチキ": 220
 }
 
+# ドリンク名と単品価格を辞書型で定義
 DRINK_PRICES = {
     "コカ・コーラ(M)": 270,
     "スプライト(M)": 270,
@@ -38,6 +40,14 @@ DRINK_PRICES = {
 
 
 def burger_order():
+    '''
+    [概要]
+    ハンバーガーを数値で注文するための関数．
+    実行されると，各ハンバーガーに数値が付与される．
+    
+    Return:
+       burger (str): 入力された数値と紐づけられたハンバーガー名のテキスト
+    '''
     burger = pyip.inputMenu(
         (
             "ビッグマック",
@@ -54,6 +64,14 @@ def burger_order():
 
 
 def sidemenu_order():
+    '''
+    [概要]
+    サイドメニューを数値で注文するための関数．
+    実行されると，各サイドメニューに数値が付与される．
+    
+    Return:
+       sidemenu (str): 入力された数値と紐づけられたサイドメニューのテキスト
+    '''
     sidemenu = pyip.inputMenu(
         (
             "マックフライポテト(M)",
@@ -70,6 +88,14 @@ def sidemenu_order():
 
 
 def drink_order():
+    '''
+    [概要]
+    ドリンクを数値で注文するための関数．
+    実行されると，各ドリンクに数値が付与される．
+    
+    Return:
+       drink (str): 入力された数値と紐づけられたドリンク名のテキスト
+    '''
     drink = pyip.inputMenu(
         (
             "コカ・コーラ(M)",
@@ -86,6 +112,13 @@ def drink_order():
 
 
 def order_check():
+    '''
+    [概要]
+    追加注文の有無を"はい"か"いいえ"で入力するための関数．
+    
+    Return:
+       decision (str): "はい"もしくは"いいえ"というテキストデータ
+    '''
     decision = pyip.inputYesNo(
         "ご注文は以上でよろしいでしょうか?\n",
         yesVal="はい",
@@ -96,6 +129,14 @@ def order_check():
 
 
 def accountiong(total_price):
+    '''
+    [概要]
+    お会計用の関数．
+    5秒以内に支払いが完了しなければ取引がキャンセルされる．
+    
+    Arg:
+        total_price (int): 注文されたメニューに応じた合計金額
+    '''
     try:
         cash = pyip.inputInt(
             "5秒以内にお支払いください．\n",
@@ -122,6 +163,12 @@ def accountiong(total_price):
     
 
 def price_check():
+    '''
+    [概要]
+    上で定義したすべての関数を連動させるための関数．
+    ハンバーガー・サイドメニュー・ドリンクの注文内容に応じた
+    合計金額を算出している．
+    '''
     total_price = 0
 
     while True:
