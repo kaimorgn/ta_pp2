@@ -120,7 +120,7 @@ def order_check():
        decision (str): "はい"もしくは"いいえ"というテキストデータ
     '''
     decision = pyip.inputYesNo(
-        "ご注文は以上でよろしいでしょうか?\n",
+        "ご注文は以上でよろしいでしょうか?('はい'/'いいえ')\n",
         yesVal="はい",
         noVal="いいえ"
     )
