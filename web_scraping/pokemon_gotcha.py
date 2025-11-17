@@ -8,6 +8,9 @@
 # を参照して，好きなポケモンの画像を
 # 取得して保存するプログラム．
 #
+# ＊名前の一部が一致している場合は，
+# 　全て保存する．
+#
 
 
 from bs4 import BeautifulSoup
@@ -20,17 +23,24 @@ from logging import getLogger
 from pathlib import Path
 import time
 import sys
-import os
+
+USAGE = "[USAGE] python pokemon_gotcha.py pokemon_name"
 
 
 # loggingの設定を反映して，専用のロガーを作成
 setup_logging()
 logger = getLogger(__name__)
 
+# driverをグローバル変数としてセット
 driver = setup_driver()
 
 
 def scroll_page(url):
+    '''
+    [概要]
+    driverオブジェクトを使って対象のWebサイトを
+    一番下までスクロールする関数．
+    '''
     assert isinstance(url, str), "url は文字列型である必要があります"
     
     try:
@@ -81,8 +91,6 @@ def make_soup(page_source):
     Arg:
         url (str): 情報を取得したい Webサイトの URL を指定．
     '''
-    #assert isinstance(url, str), "url引数を文字列型で指定してください．"
-
     try:
         logger.info(
             "driverで取得した HTML を読み込んでオブジェクトを作成します"
@@ -103,40 +111,10 @@ def make_soup(page_source):
         raise
 
 
-def new_make_soup(url):
+def found_img_sources(soup, name, tag="img"):
     '''
     [概要]
-    指定された url (今回は公式のポケモンずかん) を参照して，
-    BeautifulSoup オブジェクト (soup) を作成し，返す関数．
-
-    Arg:
-        url (str): 情報を取得したい Webサイトの URL を指定．
-    '''
-    #assert isinstance(url, str), "url引数を文字列型で指定してください．"
-
-    try:
-        logger.info(
-            "driverで取得した HTML を読み込んでオブジェクトを作成します"
-        )
-        response = requests.get(url)
-        soup = BeautifulSoup(
-            response.text, "html.parser"
-        )
-        logger.info(
-            "BeautifulSoup オブジェクトを作成しました"
-        )
-
-        return soup
-
-    except Exception as e:
-        logger.error(
-            f"BeautifulSoup オブジェクトの作成時にエラーが発生しました: {e}"
-        )
-        raise
-
-
-def found_img_source(soup, name, tag="img"):
-    '''
+    取得したい画像のURIを取得する関数．
     ''' 
     try:
         logger.info("指定の画像を見つけます")
@@ -144,6 +122,7 @@ def found_img_source(soup, name, tag="img"):
         logger.debug(
             f"img_tagsの中身: {len(img_tags)}"
         )
+        img_srcs = []
         for img in img_tags:
             alt_text = img.get("alt")
 
@@ -151,15 +130,17 @@ def found_img_source(soup, name, tag="img"):
                 logger.info(
                     f"{name}の気配がする・・・"
                 )
+                time.sleep(2)
 
                 img_src = img.get("src")
+                img_srcs.append(img_src)
 
                 if not img_src:
                     logger.warning(
                         f"{name}はここにはいないようだ・・・"
                     )
 
-        return img_src
+        return img_srcs
 
     except Exception as e:
         logger.error(
@@ -168,9 +149,13 @@ def found_img_source(soup, name, tag="img"):
         raise
 
 
-def gotcha(url, img_src, save_img_path):
+def gotcha(img_src, save_img_path):
+    '''
+    [概要]
+    画像のURIを指定してダウンロードする関数．
+    '''
     try:
-        img_url = f"{img_src}"
+        img_url = img_src
         logger.info(
             f"指定の URL へリクエストを送ります: {img_url}"
         )
@@ -192,6 +177,8 @@ def gotcha(url, img_src, save_img_path):
             f"ポケモンを捕獲しました!: {save_img_path}"
         )
 
+        time.sleep(2)
+        
         return True
 
     except Exception as e:
@@ -201,27 +188,36 @@ def gotcha(url, img_src, save_img_path):
         raise
 
 
-def main():
+def main(name):
+    '''
+    [概要]
+    定義した別関数を連動させて実行するメインの関数．
+    '''
     url = "https://zukan.pokemon.co.jp/"
-    name = "テラパゴス"
 
     save_dir = Path("output")
     save_dir.mkdir(exist_ok=True)
-    
-    img_name = f"gotcha_{name}.png"
-
-    save_img_path = save_dir / img_name
 
     page_source = scroll_page(url)
     
     soup = make_soup(page_source)
-    img_src = found_img_source(soup, name)
+    img_srcs = found_img_sources(soup, name)
 
-    gotcha(url, img_src, save_img_path)
+    for i, img_src in enumerate(img_srcs):
+        img_name = f"pokemon_gotcha_{i+1}.png"
+        save_img_path = save_dir / img_name
+        gotcha(img_src, save_img_path)
 
-    driver.quit()
+    logger.info(
+        f"{name}を{len(img_srcs)}匹，ゲットだぜ!"
+    )
     
+    driver.quit()
+
 
 if __name__ == "__main__":
-    main()
-    
+    if len(sys.argv) > 1:
+        name = sys.argv[1]
+        main(name)
+    else:
+        logger.info(USAGE)
