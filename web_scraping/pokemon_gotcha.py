@@ -206,6 +206,7 @@ def main(name):
     for i, img_src in enumerate(img_srcs):
         img_name = f"pokemon_gotcha_{i+1}.png"
         save_img_path = save_dir / img_name
+        time.sleep(10)
         gotcha(img_src, save_img_path)
 
     logger.info(
