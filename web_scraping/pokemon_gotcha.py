@@ -31,11 +31,8 @@ USAGE = "[USAGE] python pokemon_gotcha.py pokemon_name"
 setup_logging()
 logger = getLogger(__name__)
 
-# driverをグローバル変数としてセット
-driver = setup_driver()
 
-
-def scroll_page(url):
+def scroll_page(driver, url):
     '''
     [概要]
     driverオブジェクトを使って対象のWebサイトを
@@ -82,6 +79,28 @@ def scroll_page(url):
         raise
 
 
+def save_pokedex_html(page_source, save_path):
+    '''
+    [概要]
+    selenium で取得した HTML をローカルに保存する関数
+    '''
+    assert isinstance(page_source, str), "page_source は文字列にしてください"
+
+    try:
+        logger.info("取得したHTMLをローカルに保存します")
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(page_source)
+        logger.info("HTMLをローカルに保存しました")
+        
+        return True
+
+    except Exception as e:
+        logger.error(
+            f"HTML保存中にエラーが発生しました: {e}"
+        )
+        raise
+    
+
 def make_soup(page_source):
     '''
     [概要]
@@ -93,7 +112,7 @@ def make_soup(page_source):
     '''
     try:
         logger.info(
-            "driverで取得した HTML を読み込んでオブジェクトを作成します"
+            "HTML を読み込んでオブジェクトを作成します"
         )
         soup = BeautifulSoup(
             page_source, "html.parser"
@@ -195,11 +214,32 @@ def main(name):
     '''
     url = "https://zukan.pokemon.co.jp/"
 
+    input_dir = Path("input")
+    pokedex_html_path = input_dir / "pokedex.html"
+
     save_dir = Path("output")
     save_dir.mkdir(exist_ok=True)
 
-    page_source = scroll_page(url)
-    
+    if not pokedex_html_path.exists():
+        logger.info("pokedex.html が存在しません．取得処理を開始します．")
+        # driverをグローバル変数としてセット
+        driver = setup_driver()
+        page_source = scroll_page(driver, url)
+        save_pokedex_html(page_source, pokedex_html_path)
+        driver.quit()
+
+    else:
+        logger.info("既存の pokedex.html を使用します")
+        try:
+            with open(pokedex_html_path, "r", encoding="utf-8") as f:
+                page_source = f.read()
+
+        except Exception as e:
+            logger.error(
+                f"ローカル HTML の読み込みに失敗しました: {e}"
+            )
+            raise
+        
     soup = make_soup(page_source)
     img_srcs = found_img_sources(soup, name)
 
@@ -212,8 +252,6 @@ def main(name):
     logger.info(
         f"{name}を{len(img_srcs)}匹，ゲットだぜ!"
     )
-    
-    driver.quit()
 
 
 if __name__ == "__main__":
