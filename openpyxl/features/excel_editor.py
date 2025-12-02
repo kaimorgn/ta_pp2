@@ -14,6 +14,7 @@
 from openpyxl import load_workbook
 
 from logging import getLogger
+from pathlib import Path
 
 # 専用のロガーを作成
 logger = getLogger(__name__)
@@ -77,6 +78,35 @@ def edit_cell(ws, cell_number, insert_data):
         raise e
 
 
+def insert_internship_info(
+        ws, base_date, days_delta, e_column_list, w_column_list
+):
+    '''
+    '''
+    assert isinstance(e_column_list, list), "e_column_listはリスト型にして"
+    assert isinstance(w_column_list, list), "w_column_listはリスト型にして"
+
+    try:
+        logger.info("提出者情報を編集します")
+        target_rows = range(3, 7)
+        
+        for row_num, text in zip(target_rows, e_column_list):
+            cell_number = f"E{row_num}"
+            edit_cell(ws, cell_number, text)
+
+        target_rows = range(3, 5)
+        for row_num, text in zip(target_rows, w_column_list):
+            cell_number = f"W{row_num}"
+            edit_cell(ws, cell_number, text)
+        logger.info("提出者情報を編集しました")
+
+    except Exception as e:
+        logger.error(
+            f"提出者情報の編集中にエラーが発生しました: {e}"
+        )
+        raise e
+    
+    
 def save_workbook(wb_obj, save_path):
     '''
     '''
@@ -98,7 +128,6 @@ def save_workbook(wb_obj, save_path):
 
 if __name__ == "__main__":
     from setup_logging import setup_logging
-    from pathlib import Path
 
     setup_logging()
 
