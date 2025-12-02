@@ -48,14 +48,41 @@ def make_internship_period(base_date, days_delta):
         raise e
 
 
+def make_date_list(base_date, days_delta):
+    assert isinstance(base_date, JDatetime), "base_dateはJDatetime型想定"
+    assert isinstance(days_delta, int), "days_deltaは整数型にして"
+
+    try:
+        logger.info("実習月日リストを作成します")
+        date_list = []
+        for i in range(days_delta):
+            date = base_date - timedelta(days=i+1)
+            date_list.append(
+                date.strftime("%m/%d (%#a)")
+            )
+        date_list.reverse()
+        
+        logger.info("実習月日リストを作成しました")
+        logger.debug(
+            f"作成したリスト: {date_list}"
+        )
+
+        return date_list
+
+    except Exception as e:
+        logger.error(
+            f"実習月日リストを作成中にエラーが発生しました: {e}"
+        )
+        raise e
+        
+
+
 if __name__ == "__main__":
     from setup_logging import setup_logging
 
     setup_logging()
 
     base_date = JDatetime.today()
-    days_delta = 10
-    period = make_internship_period(base_date, days_delta)
-    logger.debug(
-        f"出力チェック: {period}"
-    )
+    days_delta = 5
+    # make_internship_period(base_date, days_delta)
+    make_date_list(base_date, days_delta)
