@@ -2,9 +2,10 @@
 #
 # txt_reader.py
 #
-#
-#
-#
+# [概要]
+# .txtファイルから文字列を
+# 取得して，カテゴリ別のリストに
+# まとめて返すプログラム．
 #
 
 from logging import getLogger

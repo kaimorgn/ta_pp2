@@ -33,10 +33,14 @@ def make_three_day_report(save_dir):
     three_day_report_path = Path(
         "input/internship_training_report_3_day_format.xlsx"
     )
+    three_day_data = Path(
+        "input/report_data_3day.txt"
+    )
     save_path = save_dir / "internship_training_report_3day.xlsx"
 
     try:
         wb_obj, ws = load_worksheet(three_day_report_path, "3day")
+        
         
         base_date = JDatetime.today()
         days_delta = 3
