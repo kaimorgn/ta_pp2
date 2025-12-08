@@ -22,8 +22,6 @@ logger = getLogger(__name__)
 
 
 def load_worksheet(xlsx_path, sheet_name):
-    '''
-    '''
     assert isinstance(xlsx_path, Path), "ExcelファイルはPathオブジェクトで渡す"
     assert isinstance(sheet_name, str), "シート名は文字列型で渡して"
 
@@ -57,8 +55,6 @@ def load_worksheet(xlsx_path, sheet_name):
 
 
 def edit_cell(ws, cell_number, insert_data):
-    '''
-    '''
     assert isinstance(cell_number, str), "セル番号は文字列で指定して"
 
     try:
@@ -82,8 +78,6 @@ def edit_cell(ws, cell_number, insert_data):
 def insert_internship_info(
         ws, base_date, days_delta, e_column_list, w_column_list
 ):
-    '''
-    '''
     assert isinstance(e_column_list, list), "e_column_listはリスト型にして"
     assert isinstance(w_column_list, list), "w_column_listはリスト型にして"
 
@@ -112,8 +106,6 @@ def insert_internship_info(
 
 
 def insert_internship_schedule(ws, date_list, content_list, comment_list):
-    '''
-    '''
     assert isinstance(date_list, list), "date_listはリスト型"
     assert date_list, "date_listの中身が空です．直前の処理を確認してください"
     
@@ -155,8 +147,6 @@ def insert_internship_schedule(ws, date_list, content_list, comment_list):
 
 
 def insert_internship_summary(ws, summary, num):
-    '''
-    '''
     assert summary, "summaryデータが空です"
     assert isinstance(summary, str), "summaryは文字列型想定です"
 
@@ -174,8 +164,6 @@ def insert_internship_summary(ws, summary, num):
 
 
 def insert_message_for_junior(ws, message, num):
-    '''
-    '''
     assert message, "messageデータが空です"
     assert isinstance(message, str), "messageは文字列型想定です"
 
@@ -193,8 +181,6 @@ def insert_message_for_junior(ws, message, num):
 
 
 def save_workbook(wb_obj, save_path):
-    '''
-    '''
     assert isinstance(save_path, Path), "save_pathはPathオブジェクトにして"
 
     try:

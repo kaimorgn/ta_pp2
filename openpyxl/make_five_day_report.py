@@ -4,7 +4,7 @@
 #
 # [概要]
 # 秋県大のキャリア情報センターが配布している
-# インターンシップ実習報告書（1~3日間，5日間，10日間）を
+# インターンシップ実習報告書(5日間)を
 # 自動編集して保存するプログラム．
 # 
 # なお，openpyxlを使った操作は
@@ -27,6 +27,8 @@ logger = getLogger(__name__)
 
 def make_five_day_report(save_dir, txt_path):
     '''
+    [概要]
+    5日分のインターンシップ実習報告書を作成する関数
     '''
     assert isinstance(save_dir, Path), "save_dirはPathオブジェクトにして"
 
