@@ -28,7 +28,7 @@ def make_internship_period(base_date, days_delta):
 
     try:
         logger.info("実習期間文字列を作成します")
-        delta_days_ago = base_date - timedelta(days=days_delta)
+        delta_days_ago = base_date - timedelta(days=days_delta - 1)
 
         base_period = base_date.strftime("%m月%d日(%#a)")
         delta_days_period = delta_days_ago.strftime("%g%-e年%m月%d日(%#a)")
@@ -56,7 +56,7 @@ def make_date_list(base_date, days_delta):
         logger.info("実習月日リストを作成します")
         date_list = []
         for i in range(days_delta):
-            date = base_date - timedelta(days=i+1)
+            date = base_date - timedelta(days=i)
             date_list.append(
                 date.strftime("%m/%d (%#a)")
             )
@@ -83,6 +83,6 @@ if __name__ == "__main__":
     setup_logging()
 
     base_date = JDatetime.today()
-    days_delta = 5
+    days_delta = 3
     # make_internship_period(base_date, days_delta)
     make_date_list(base_date, days_delta)

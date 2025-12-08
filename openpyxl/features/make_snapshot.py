@@ -9,6 +9,7 @@
 #
 
 from logging import getLogger
+from pathlib import Path
 import zipfile
 
 # 専用のロガーを作成
@@ -26,9 +27,13 @@ def make_snapshot(data_path, snapshot_path):
 
     try:
         logger.info("スナップショット（ZIPファイル）を作成します")
-        logger.debug(f"対象データ: {len(data_path.resolve())}個")
 
-        logger.info("スナップショットを作成しました ->  {output_path}")
+        items = list(data_path.iterdir())
+        with zipfile.ZipFile(snapshot_path, "w") as zf:
+            for i, item in enumerate(items):
+                zf.write(item)
+
+        logger.info(f"スナップショットを作成しました ->  {snapshot_path}")
 
         return True
 

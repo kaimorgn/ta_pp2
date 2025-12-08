@@ -9,6 +9,7 @@
 #
 
 from logging import getLogger
+from pathlib import Path
 
 # 専用のロガーを作成
 logger = getLogger(__name__)
