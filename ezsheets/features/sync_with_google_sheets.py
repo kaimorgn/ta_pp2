@@ -55,7 +55,7 @@ class SyncWithGoogleSheets:
             self.sheets_dict = ezsheets.listSpreadsheets()
             if not self.sheets_dict:
                 logger.warning(
-                    f"シートを取得できなかった: {len(self.sheets_dict)}"
+                    f">>> シートを取得できなかった: {len(self.sheets_dict)}"
                 )
                 raise
 
@@ -74,7 +74,44 @@ class SyncWithGoogleSheets:
 
         except Exception as e:
             logger.error(
-                f"複数のスプレッドシート取得時にエラーが発生しました: {e}"
+                f"複数のスプレッドシート取得時にエラーが発生した: {e}"
+            )
+            raise e
+
+    def read_sheets_by_title(self, title_name):
+        '''
+        '''
+        assert title_name, "検索したいシート名を渡して"
+        assert isinstance(title_name, str), "シート名は文字列型にして"
+        
+        self._make_sheets_dict()
+        target_id = None
+        try:
+            logger.debug(f"> {title_name}と一致するシートを検索します")
+            for sheet_id, title in self.sheets_dict.items():
+                if title == title_name:
+                    target_id = sheet_id
+                    logger.debug(
+                        f"> {title_name}と一致するシートが見つかった"
+                    )
+                    break
+
+            if target_id is None:
+                logger.warning(
+                    f">>> {title_name}と一致するシートが見つからなかった"
+                )
+                raise
+
+            logger.info(
+                f">> タイトル: {title_name} (ID: {target_id})を読み込む"
+            )
+            self.ss = ezsheets.Spreadsheet(target_id)
+
+            return True
+
+        except Exception as e:
+            logger.error(
+                f">>>> タイトルと一致するシート検索時にエラーが発生: {e}"
             )
             raise e
 
@@ -88,4 +125,5 @@ if __name__ == "__main__":
     setup_logging(logging_config)
 
     secret_file = Path("./credentials-sheets.json")
-    SyncWithGoogleSheets(secret_file)._make_sheets_dict()
+    title_name  = "【駆けこみ寺】勤務表"
+    SyncWithGoogleSheets(secret_file).read_sheets_by_title(title_name)
