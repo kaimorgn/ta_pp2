@@ -49,6 +49,11 @@ class SyncWithGoogleSheets:
 
     def _make_sheets_dict(self):
         '''
+        [概要]
+        listSpreadsheets()を使って，編集権限と閲覧権限がある
+        スプレッドシートを辞書型で取得するメソッド．
+        取得した辞書型は self.sheets_dict インスタンス変数で保持される．
+        また，コンソール上には取得したシートのタイトルとIDを出力する．
         '''
         try:
             logger.debug("> 複数のスプレッドシートを取得します")
@@ -57,7 +62,6 @@ class SyncWithGoogleSheets:
                 logger.warning(
                     f">>> シートを取得できなかった: {len(self.sheets_dict)}"
                 )
-                raise
 
             logger.debug("> 複数のスプレッドシートを取得しました")
             logger.info(
@@ -78,8 +82,14 @@ class SyncWithGoogleSheets:
             )
             raise e
 
-    def read_sheets_by_title(self, title_name):
+    def _read_sheet_id_by_title(self, title_name):
         '''
+        [概要]
+        self._make_sheets_dict()を実行して作成した
+        self.sheets_dictを参照し，引数で渡される title_name と一致する
+        スプレッドシートのIDを取得するメソッド．
+        取得したIDを参照してスプレッドシートのオブジェクトを作成する．
+        なお，オブジェクトは self.ss インスタンス変数が保持する．
         '''
         assert title_name, "検索したいシート名を渡して"
         assert isinstance(title_name, str), "シート名は文字列型にして"
@@ -100,14 +110,12 @@ class SyncWithGoogleSheets:
                 logger.warning(
                     f">>> {title_name}と一致するシートが見つからなかった"
                 )
-                raise
 
             logger.info(
                 f">> タイトル: {title_name} (ID: {target_id})を読み込む"
             )
-            self.ss = ezsheets.Spreadsheet(target_id)
 
-            return True
+            return target_id
 
         except Exception as e:
             logger.error(
@@ -115,15 +123,97 @@ class SyncWithGoogleSheets:
             )
             raise e
 
+    def copy_template_sheet(self, template_sheet_name, new_sheet_name):
+        '''
+        [概要]
+        テンプレートシートを複製するメソッド
+        '''
+        assert template_sheet_name, "テンプレートシートの名前を渡して"
+        assert isinstance(template_sheet_name, str), "文字列型を渡して"
+        assert new_sheet_name, "複製後のシート名を渡して"
+        assert isinstance(new_sheet_name, str), "文字列型を渡して"
 
+        template_id = self._read_sheet_id_by_title(template_sheet_name)
+        template_ss = ezsheets.Spreadsheet(template_id)
+        downloads_path = Path(f"./{new_sheet_name}.xlsx")
+        try:
+            logger.debug(
+                f"> テンプレート {template_sheet_name} を複製する"
+            )
+            template_ss.downloadAsExcel(downloads_path)
+
+            if downloads_path.exists() == True:
+                self.ss = ezsheets.upload(downloads_path.name)
+                downloads_path.unlink(missing_ok=True)
+                logger.debug(
+                    f"> 複製時にダウンロードしたファイルを削除した"
+                )
+            
+            logger.debug(
+                f"> テンプレートの複製に成功した -> {new_sheet_name}"
+            )
+            logger.info(
+                f">> テンプレートを複製した -> {new_sheet_name}"
+            )
+
+            return True
+
+        except Exception as e:
+            logger.error(
+                f">>>> テンプレートの複製時にエラーが発生した: {e}"
+            )
+            raise e
+
+    def edit_sheet_cell(self, row_num, data_list, sheet_num=0, max_history=15):
+        '''
+        '''
+        assert row_num, "データを挿入する行を数値で指定してください"
+        assert isinstance(row_num, int), "行は整数型で渡してください"
+        assert data_list, "data_listが空です"
+        assert isinstance(data_list, list), "データはリスト型で渡して"
+
+        sheet = self.ss[sheet_num]
+        try:
+            logger.info(">> データを追加します")
+            sheet.updateRow(row_num, data_list)
+            logger.debug("> データを追加しました")
+
+            return True
+
+        except Exception as e:
+            logger.error(
+                f">>>> データ更新中にエラーが発生しました: {e}"
+            )
+            raise e
+
+    
 if __name__ == "__main__":
     from setup_logging import setup_logging
     import os
+    import time
 
     os.chdir("../config/")
     logging_config = Path("./logging_config.yml")
     setup_logging(logging_config)
 
     secret_file = Path("./credentials-sheets.json")
-    title_name  = "【駆けこみ寺】勤務表"
-    SyncWithGoogleSheets(secret_file).read_sheets_by_title(title_name)
+    template_sheet_name  = "25PP2_W11_PC-Monitor"
+    new_sheet_name = "m26d003@mse08vm03"
+    sync_with_google_sheets = SyncWithGoogleSheets(secret_file)
+    sync_with_google_sheets.copy_template_sheet(
+        template_sheet_name, new_sheet_name
+    )
+    data_lists = [
+        [4.5, 9.2],
+        [5.2, 10.6],
+        [6.1, 10.7],
+        [6.5, 10.9],
+        [8.5, 12.2]
+    ]
+    for index, data_list in enumerate(data_lists):
+        row_num = index + 2
+        sync_with_google_sheets.edit_sheet_cell(row_num, data_list)
+        logger.debug("> 次のデータ挿入まで3秒待機します")
+        time.sleep(3)
+
+    
