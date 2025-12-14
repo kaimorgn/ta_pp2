@@ -3,14 +3,13 @@
 # sync_with_google_sheets.py
 # 
 # [概要]
-#
-#
-#
-#
-#
-#
-#
-#
+# ezsheetsモジュールを使って
+# Google スプレッドシートを編集する
+# プログラム
+# 
+# タイトル(ファイル名)からIDを取得したり
+# セルを編集する(データを書き込む)処理を
+# クラス内に定義している
 #
 
 import ezsheets
@@ -166,6 +165,8 @@ class SyncWithGoogleSheets:
 
     def edit_sheet_cell(self, row_num, data_list, sheet_num=0, max_history=15):
         '''
+        [概要]
+        特定のシート内のセルを編集する(データを書き込む)ためのメソッド
         '''
         assert row_num, "データを挿入する行を数値で指定してください"
         assert isinstance(row_num, int), "行は整数型で渡してください"
@@ -197,7 +198,7 @@ if __name__ == "__main__":
     setup_logging(logging_config)
 
     secret_file = Path("./credentials-sheets.json")
-    template_sheet_name  = "25PP2_W11_PC-Monitor"
+    template_sheet_name  = "25PP2_W11_VM-Monitor"
     new_sheet_name = "m26d003@mse08vm03"
     sync_with_google_sheets = SyncWithGoogleSheets(secret_file)
     sync_with_google_sheets.copy_template_sheet(
@@ -215,5 +216,3 @@ if __name__ == "__main__":
         sync_with_google_sheets.edit_sheet_cell(row_num, data_list)
         logger.debug("> 次のデータ挿入まで3秒待機します")
         time.sleep(3)
-
-    
