@@ -72,6 +72,10 @@ class SyncRAM:
             f"> RAM Swap Memory: '{self.read_total_swap_memory()}'"
         )
 
+        return {
+            "ram_total_virtual_memoty": self.read_total_virtual_memory()
+        }
+
     def collect_dynamic_info(self):
         '''
         [概要]

@@ -22,17 +22,15 @@ logger = getLogger(__name__)
 
 
 class SyncWithGoogleSheets:
-    def __init__(self, secret_file):
-        self._refresh_token(secret_file)
+    def __init__(self):
+        self._refresh_token()
 
-    def _refresh_token(self, secret_file):
+    def _refresh_token(self):
         '''
         [概要]
         client_secret_*.jsonを使ってトークンを発行するためのメソッド．
         インスタンス生成と同時に実行される．
         '''
-        assert secret_file, "client_secret.jsonのパスを確認してください"
-        assert isinstance(secret_file, Path), "Pathオブジェクトにしてください"
 
         try:
             logger.debug("> 新しいトークンを発行します")
@@ -163,10 +161,33 @@ class SyncWithGoogleSheets:
             )
             raise e
 
-    def edit_sheet_cell(self, row_num, data_list, sheet_num=0, max_history=15):
+    def edit_sheet_cell(self, cell, data, sheet_num=0):
         '''
         [概要]
         特定のシート内のセルを編集する(データを書き込む)ためのメソッド
+        '''
+        assert cell, "編集対象のセルを渡してください"
+        assert isinstance(cell, str), "編集対象のセルは文字列で指定する"
+        assert data, "セルに書き込むデータを渡してください"
+
+        sheet = self.ss[sheet_num]
+        try:
+            logger.debug(f"'{cell}' セルに {data} を書き込みます")
+            sheet[cell] = data
+            logger.debug(f"'{cell}' セルに {data} を書き込みました")
+
+            return True
+
+        except Exception as e:
+            logger.error(
+                f"セルにデータを書き込む際にエラーが発生しました: {e}"
+            )
+            raise e
+
+    def edit_sheet_row(self, row_num, data_list, sheet_num=0):
+        '''
+        [概要]
+        特定のシート内の行を編集する(データを書き込む)ためのメソッド
         '''
         assert row_num, "データを挿入する行を数値で指定してください"
         assert isinstance(row_num, int), "行は整数型で渡してください"
@@ -197,10 +218,9 @@ if __name__ == "__main__":
     logging_config = Path("./logging_config.yml")
     setup_logging(logging_config)
 
-    secret_file = Path("./credentials-sheets.json")
     template_sheet_name  = "25PP2_W11_VM-Monitor"
     new_sheet_name = "m26d003@mse08vm03"
-    sync_with_google_sheets = SyncWithGoogleSheets(secret_file)
+    sync_with_google_sheets = SyncWithGoogleSheets()
     sync_with_google_sheets.copy_template_sheet(
         template_sheet_name, new_sheet_name
     )
@@ -211,8 +231,8 @@ if __name__ == "__main__":
         [6.5, 10.9],
         [8.5, 12.2]
     ]
-    for index, data_list in enumerate(data_lists):
-        row_num = index + 2
-        sync_with_google_sheets.edit_sheet_cell(row_num, data_list)
+    for index, row_num in enumerate(data_lists):
+        row_num = index + 1
+        sync_with_google_sheets.edit_sheet_row(row_num, data_list)
         logger.debug("> 次のデータ挿入まで3秒待機します")
         time.sleep(3)

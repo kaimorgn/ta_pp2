@@ -80,6 +80,14 @@ class SyncCPU:
         logger.debug(f"> Logical Cores: '{self.read_logical_cores()}'")
         logger.debug(f"> Phisical Cores: '{self.read_phisical_cores()}'")
 
+        return {
+            "cpu_vendor": self.read_cpu_vendor(),
+            "cpu_brand": self.read_cpu_brand(),
+            "machine_type": self.read_machine_type(),
+            "logical_cores": self.read_logical_cores(),
+            "phisical_cores": self.read_phisical_cores()
+        }
+
     def collect_dynamic_info(self):
         '''
         [概要]
@@ -88,8 +96,12 @@ class SyncCPU:
         今回はCPUの平均使用率のみを確認
         '''
         logger.debug("> CPUの動的情報のみを出力します")
-
+        
         logger.debug(f"> CPU Utilities: '{self.read_cores_utilities()}'")
+        
+        return {
+            "cpu_utilities": self.read_cores_utilities()
+        }
 
 
 if __name__ == "__main__":
