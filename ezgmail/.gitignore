@@ -1,0 +1,6 @@
+*~
+*.log
+*.pickle
+*.json
+client_secret_*.json
+__pycache__
