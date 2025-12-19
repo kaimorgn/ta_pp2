@@ -3,4 +3,8 @@
 *.pickle
 *.json
 client_secret_*.json
+*.zip
+*.pdf
+*.doc
+*.docx
 __pycache__
