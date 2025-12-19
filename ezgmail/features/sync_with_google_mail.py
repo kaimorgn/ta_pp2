@@ -47,12 +47,8 @@ class SyncWithGoogleMail:
             logger.debug(f"> '{search_target}' と一致するメールを取得する")
             self.searched_threads = ezgmail.search(search_target)
             logger.debug(
-                f"> {len(self.searched_threads)} 件のメールを取得した"
+                f"> '{search_target}' と一致するメールを取得した"
             )
-            logger.debug(
-                f"> メール本文を表示します: \n{self.searched_threads[0]}"
-            )
-            
             logger.info(
                 f">> {len(self.searched_threads)} 件のメールを取得した"
             )
@@ -94,7 +90,41 @@ class SyncWithGoogleMail:
                 f"メール送信時にエラーが発生した: {e}"
             )
             raise e
-            
+
+    def download_attached_files(self, from_address, download_path="./"):
+        '''
+        [概要]
+        ファイルが添付されているメールだけを検索して
+        実際にファイルをダウンロードするメソッド
+        '''
+        assert from_address, "送信元のメールアドレスを渡して"
+        assert isinstance(from_address, str), "メールアドレスは文字列型"
+        
+        try:
+            logger.info(f">> '{from_address}'からのメールを取得する")
+            self.search_thread(from_address)
+            logger.debug(
+                f"> {len(self.searched_threads[0].messages[0].attachments)} 個"
+            )
+            for thread in self.searched_threads[:3]:
+                thread.messages[0].downloadAllAttachments(
+                    downloadFolder=download_path
+                )
+                logger.debug(
+                    f"> '{thread.messages[0].attachments}' をダウンロード")
+                
+            logger.info(
+                f"メールに添付されていたファイルをダウンロードした"
+            )
+
+            return True
+
+        except Exception as e:
+            logger.error(
+                f"添付ファイルのダウンロード時にエラー発生: {e}"
+            )
+            raise e
+
 
 if __name__ == "__main__":
     from setup_logging import setup_logging
@@ -106,9 +136,13 @@ if __name__ == "__main__":
     os.chdir("../config")
     sync_with_google_mail = SyncWithGoogleMail()
 
-    #search_target = "【連絡】１２月１１日の落雷による被害"
+    #search_target = "has:attachment"
     #sync_with_google_mail.search_thread(search_target)
 
-    subject = "25PP2_W12_サンプルメール"
-    body = "これは Python の ezgmail で送信したメールです"
-    sync_with_google_mail.send_mail(subject, body)
+    #subject = "25PP2_W12_サンプルメール"
+    #body = "これは Python の ezgmail で送信したメールです"
+    #sync_with_google_mail.send_mail(subject, body)
+
+    from_address = "has:attachment"
+    sync_with_google_mail.download_attached_files(from_address)
+    
