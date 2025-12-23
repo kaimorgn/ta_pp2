@@ -1,0 +1,53 @@
+#------------------------------
+# logging_config.yml
+# logging設定ファイル(YAML形式)
+#------------------------------
+version: 1
+disable_existing_loggers: false
+
+#------------------------------
+# フォーマッタ(ログの出力形式)
+# console: 開発中などにコンソールで読みやすい
+#         シンプルなフォーマット
+# logfile: ファイルに保存する際の
+#          詳細なフォーマット
+#------------------------------
+formatters:
+  cli_format:
+    format: "%(levelname)-8s - %(name)s - %(message)s"
+
+  logfile_format:
+    format: "%(asctime)s - %(levelname)-8s - %(name)s - [%(funcName)s:%(lineno)d] - %(message)s"
+
+#------------------------------
+# イベントハンドラ(ログの出力先)
+# console: Terminalへの出力用
+# file: ファイルへの出力用
+#------------------------------
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: cli_format
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: logfile_format
+    filename: pp2_app.log # ＊＊＊ 必要に応じて名前を変更 ＊＊＊
+    maxBytes: 10485760
+    backupCount: 5
+    encoding: utf8
+
+#------------------------------
+# ロガー(どのロガーにどの設定を適用するか)
+#------------------------------
+loggers: {}
+
+#------------------------------
+# ルートロガー(全てのロガーのリーダー)
+#------------------------------
+root:
+  level: DEBUG
+  handlers: [console, file]
