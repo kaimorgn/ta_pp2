@@ -29,7 +29,7 @@ class CSVIO:
         elif mode == "add":
             self._make_additioner(csv_path)
 
-    def read_csv_data(self, csv_path):
+    def read_csv_data(self):
         '''
         [概要]
         _make_reader() で生成したインスタンス変数を使って
@@ -37,16 +37,16 @@ class CSVIO:
         '''
         data = []
         try:
-            logger.debug(f"> {csv_path} からデータを取得する")
+            logger.debug(f"> データを取得する")
             for row in self.reader:
                 data.append(row)
 
-            logger.info(f">> {csv_path} からデータを取得した: {len(data)}")
+            logger.info(f">> データを取得した: {len(data)}")
             return data
 
         except Exception as e:
             logger error(
-                f"{csv_path} からデータ取得時にエラーが発生: {e}"
+                f"データ取得時にエラーが発生: {e}"
             )
             raise e
 
@@ -75,18 +75,18 @@ class CSVIO:
             )
             raise e
 
-    def write_data(self, csv_path, data_lists):
+    def write_data(self, data_lists):
         '''
         [概要]
         _make_writer() で生成したインスタンス変数を使って
         CSVにデータを書き込むメソッド
         '''
         try:
-            logger.debug(f"> {csv_path} に {len(data_list)} 個書き込む")
+            logger.debug(f"> {len(data_list)} 個書き込む")
             for data in data_lists:
                 self.writer.writerow(row)
 
-            logger.debug(f"> {csv_path} に {len(data_list)} 個書き込んだ")
+            logger.debug(f"> {len(data_list)} 個書き込んだ")
             return True
 
         except Exception as e:
@@ -123,11 +123,11 @@ class CSVIO:
         '''
         '''
         try:
-            logger.debug(f"> {csv_path} にデータを追記する: {len(data_lists)}")
+            logger.debug(f"> データを追記する: {len(data_lists)}")
             for data in data_lists:
                 self.additioner.writerow(data)
 
-            logger.info(f">> {csv_path} にデータを追記した: {len(data_lists)}")
+            logger.info(f">> データを追記した: {len(data_lists)}")
             return True
 
         except Exception as e:
@@ -169,5 +169,6 @@ if __name__ == "__main__":
     setup_logging(logging_config)
 
     csv_path = Path("./input/XXX.csv")
-    csv_io = CSVIO()
+    mode = "read"
+    csv_io = CSVIO(mode)
     csv_io.XXX(csv_path)
