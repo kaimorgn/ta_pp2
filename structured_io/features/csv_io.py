@@ -3,7 +3,7 @@
 # csv_io.py
 #
 # [概要]
-# CSV モジュールを使った基本操作
+# csv モジュールを使った基本操作
 # ・データの読み取り
 # ・CSVファイルを新規作成して書き込み
 # ・既存のCSVファイルに書き込み
@@ -19,41 +19,14 @@ logger = getLogger(__name__)
 
 
 class CSVIO:
-    def __init__(self, csv_path, mode):
-        if mode == "read":
-            self._make_reader(csv_path)
+    def __init__(self):
+        pass
 
-        elif mode == "write":
-            self._make_writer(csv_path)
-
-        elif mode == "add":
-            self._make_additioner(csv_path)
-
-    def read_csv_data(self):
+    def read_csv_data(self, csv_path):
         '''
         [概要]
-        _make_reader() で生成したインスタンス変数を使って
+        _make_reader() で生成した変数を使って
         CSV からデータを取得するメソッド
-        '''
-        data = []
-        try:
-            logger.debug(f"> データを取得する")
-            for row in self.reader:
-                data.append(row)
-
-            logger.info(f">> データを取得した: {len(data)}")
-            return data
-
-        except Exception as e:
-            logger error(
-                f"データ取得時にエラーが発生: {e}"
-            )
-            raise e
-
-    def _make_reader(self, csv_path):
-        '''
-        [概要]
-        CSVからデータを読み取る self.reader を生成するためのメソッド
         '''
         assert csv_path, "CSVを指定していない"
         assert isinstance(csv_path, Path), "CSVはPathオブジェクトで指定"
@@ -61,32 +34,52 @@ class CSVIO:
         if csv_path.exists() == False:
             logger.warning(f">>> {csv_path} が存在していません")
             raise FileNotFoundError
-        
-        try:
-            logger.info(f">> {csv_path} 読み取り用インスタンス変数を生成")
-            with open(csv_path, mode="r", encoding="utf-8") as csv_file:
-                self.reader = csv.reader(csv_path)
 
-            return True
+        data = []
+        try:
+            logger.info(f">> {csv_path} 読み取り用変数を生成")
+            with open(csv_path, mode="r", encoding="utf-8") as csv_file:
+                reader = csv.reader(csv_file)
+        
+                logger.debug(f"> データを取得する")
+                for row in reader:
+                    data.append(row)
+
+            logger.debug(f"取得したデータ: {data}")
+            logger.info(f">> データを取得した: {len(data)}")
+            return data
 
         except Exception as e:
             logger.error(
-                f"読み取り用インスタンス変数生成中にエラーが発生: {e}"
+                f"データ取得時にエラーが発生: {e}"
             )
             raise e
 
-    def write_data(self, data_lists):
+    def write_data(self, data_lists, save_csv_path="output.csv"):
         '''
         [概要]
-        _make_writer() で生成したインスタンス変数を使って
+        _make_writer() で生成した変数を使って
         CSVにデータを書き込むメソッド
         '''
-        try:
-            logger.debug(f"> {len(data_list)} 個書き込む")
-            for data in data_lists:
-                self.writer.writerow(row)
+        assert save_csv_path, "CSVを指定していない"
+        assert isinstance(save_csv_path, Path), "CSVはPathオブジェクトで指定"
 
-            logger.debug(f"> {len(data_list)} 個書き込んだ")
+        if save_csv_path.exists() == False:
+            save_csv_path.touch()
+            logger.info(
+                f">> {save_csv_path} が存在していないので新規作成する"
+            )
+        
+        try:
+            logger.info(f">> {csv_path} 書き込み用変数を生成")
+            with open(save_csv_path, mode="w", encoding="utf-8") as csv_file:
+                writer = csv.writer(csv_file)
+        
+                logger.debug(f"> {len(data_lists)} 個書き込む")
+                for data in data_lists:
+                    writer.writerow(data)
+
+            logger.debug(f"> {len(data_lists)} 個書き込んだ")
             return True
 
         except Exception as e:
@@ -94,38 +87,25 @@ class CSVIO:
                 f"データ書き込み時にエラーが発生: {e}"
             )
             raise e
-        
-    def _make_writer(self, csv_path):
+    
+    def add_data_csv(self, data_lists, csv_path):
         '''
-        [概要]
-        CSVを新規作成して書き込む self.writer を生成するためのメソッド
         '''
-        assert csv_path, "CSVを指定していない"
+        assert csv_path, "CSVを指定していない"        
         assert isinstance(csv_path, Path), "CSVはPathオブジェクトで指定"
 
         if csv_path.exists() == False:
-            logger.info(f">> {csv_path} が存在していないので新規作成する")
+            logger.warning(f">>> {csv_path} が存在していません")
+            raise FileNotFoundError
         
         try:
-            logger.info(f">> {csv_path} 書き込み用インスタンス変数を生成")
-            with open(csv_path, mode="w", encoding="utf-8") as csv_file:
-                self.writer = csv.writer(csv_path)
-
-            return True
-
-        except Exception as e:
-            logger.error(
-                f"書き込み用インスタンス変数生成中にエラーが発生: {e}"
-            )
-            raise e
-
-    def add_data_csv(self, csv_path, data_lists):
-        '''
-        '''
-        try:
-            logger.debug(f"> データを追記する: {len(data_lists)}")
-            for data in data_lists:
-                self.additioner.writerow(data)
+            logger.info(f">> {csv_path} 追記するための変数を生成")
+            with open(csv_path, mode="a", encoding="utf-8") as csv_file:
+                additioner = csv.writer(csv_file)
+                
+                logger.debug(f"> データを追記する: {len(data_lists)}")
+                for data in data_lists:
+                    additioner.writerow(data)
 
             logger.info(f">> データを追記した: {len(data_lists)}")
             return True
@@ -136,31 +116,6 @@ class CSVIO:
             )
             raise e
 
-    def _make_additioner(self, csv_path):
-        '''
-        [概要]
-        既存のCSVにデータを追記する self.additioner を生成するためのメソッド
-        '''
-        assert csv_path, "CSVを指定していない"        
-        assert isinstance(csv_path, Path), "CSVはPathオブジェクトで指定"
-
-        if csv_path.exists() == False:
-            logger.warning(f">>> {csv_path} が存在していません")
-            raise FileNotFoundError
-        
-        try:
-            logger.info(f">> {csv_path} 追記するためのインスタンス変数を生成")
-            with open(csv_path, mode="a", encoding="utf-8") as csv_file:
-                self.additioner = csv.writer(csv_path)
-
-            return True
-
-        except Exception as e:
-            logger.error(
-                f"追記するためのインスタンス変数生成中にエラーが発生: {e}"
-            )
-            raise e
-
 
 if __name__ == "__main__":
     from setup_logging import setup_logging
@@ -168,7 +123,20 @@ if __name__ == "__main__":
     logging_config = Path("../config/logging_config.yml")
     setup_logging(logging_config)
 
-    csv_path = Path("./input/XXX.csv")
-    mode = "read"
-    csv_io = CSVIO(mode)
-    csv_io.XXX(csv_path)
+    csv_path = Path("output.csv")
+    csv_handler = CSVIO()
+    input_data = [
+        ["id", "name", "mail"],
+        ["1", "kai", "kai@gmail"],
+        ["2", "yama", "yama@ylab"],
+        ["3", "ogacho", "ogacho@mafu"]
+    ]
+
+    last_input_data = [
+        ["4", "jun", "jun@ibe"],
+    ]
+    
+    csv_handler.write_data(input_data, csv_path)
+    csv_handler.read_csv_data(csv_path)
+    csv_handler.add_data_csv(last_input_data, csv_path)
+    csv_handler.read_csv_data(csv_path)

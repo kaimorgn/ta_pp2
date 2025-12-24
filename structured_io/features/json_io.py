@@ -3,12 +3,11 @@
 # json_io.py
 #
 # [概要]
-#
-#
-#
-#
-#
-#
+# json モジュールを使った基本操作
+# ・既存ファイルからのデータ読み取り
+# ・JSON ファイルを新規作成して書き込み
+# ・既存の JSON ファイルに書き込み
+# を定義したプログラム
 # 
 
 from logging import getLogger
@@ -20,20 +19,32 @@ logger = getLogger(__name__)
 
 
 class JSONIO:
-    def __init__(self, json_path, mode):
+    def __init__(self):
         pass
 
-    def read_json_data(self):
+    def read_json_data(self, json_path):
         '''
+        [概要]
+        既存のJSONファイルからデータを取得するメソッド
         '''
-        data = {}
+        assert json_path, "JSONファイルパスを渡して"
+        assert isinstance(json_path, Path), "JSONのPathオブジェクトを渡して"
+
+        if json_path.exists() == False:
+            logger.warning(
+                f">>> {json_path} が存在していない"
+            )
+            raise FileNotFoundError
+            
         try:
             logger.debug(f"> データを取得する")
-            for row in self.reader:
-                data.append(row)
-
-            logger.info(f">> データを取得した: {len(data)}")
-            return True
+            with open(json_path, "r", encoding="utf-8") as json_file:
+                self.json_data = json.load(json_file)
+                logger.debug(
+                    f"> 取得したデータ: {self.json_data}"
+                )
+                logger.info(f">> {len(self.json_data)} 個のデータを取得した")
+                return self.json_data
 
         except Exception as e:
             logger.error(
@@ -41,26 +52,36 @@ class JSONIO:
             )
             raise e
         
-    def _make_reader(self, json_path):
+    def write_json_data(self, data, save_json_path=Path("./output.json")):
         '''
+        [概要]
+        JSONファイルにデータを書き込むメソッド
+        書き込み対象のJSONが存在しない場合でも新規作成した上で書き込む
         '''
-        assert json_path, "JSONを指定していない"
-        assert isinstance(json_path, Path), "JSONはPathオブジェクトで指定"
+        assert data, "書き込むデータを辞書型・JSON型で渡して"
+        
+        assert save_json_path, "JSONファイルパスを渡して"
+        assert isinstance(save_json_path, Path), "Pathオブジェクトを渡して"
 
-        if json_path.exists() == False:
-            logger.warning(f">>> {json_path} が存在していません")
-            raise FileNotFoundError
+        if save_json_path.exists() == False:
+            save_json_path.touch()
+            logger.info(
+                f">> {save_json_path} がないので新規作成した"
+            )
 
         try:
-            logger.info(f">> {json_path} 読み取り用のインスタンス変数を生成")
-            with open(json_path, mode="r", encoding="utf-8") as json_file:
-                self.reader = json.reader(json_path)
-
-            return True
+            logger.debug(f"> {save_json_path} にデータを書き込む")
+            with open(save_json_path, "w", encoding="utf-8") as json_file:
+                json.dump(
+                    data, json_file, ensure_ascii=False, indent=4
+                )
+            logger.info(
+                f">> {len(data)} 個のデータを書き込んだ"
+            )
 
         except Exception as e:
             logger.error(
-                f"読み取り用のインスタンス変数生成中にエラーが発生: {e}"
+                f"データ書き込み時にエラーが発生: {e}"
             )
             raise e
 
@@ -71,4 +92,14 @@ if __name__ == "__main__":
     logging_path = Path("../config/logging_config.yml")
     setup_logging(logging_path)
 
-    json_io = JSONIO()
+    data = {
+        "id": 1,
+        "name": "Python 3.10",
+        "features": ["Type Hinting", "Pattern Matching"],
+        "is_active": True,
+        "note": "日本語のテスト書き込み"
+    }
+    #JSONIO().write_json_data(data)
+    JSONIO().read_json_data(
+        Path("output.json")
+    )
