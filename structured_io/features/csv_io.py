@@ -45,7 +45,7 @@ class CSVIO:
                 for row in reader:
                     data.append(row)
 
-            logger.debug(f"取得したデータ: {data}")
+            #logger.debug(f"取得したデータ: {data}")
             logger.info(f">> データを取得した: {len(data)}")
             return data
 
@@ -136,7 +136,8 @@ if __name__ == "__main__":
         ["4", "jun", "jun@ibe"],
     ]
     
-    csv_handler.write_data(input_data, csv_path)
-    csv_handler.read_csv_data(csv_path)
-    csv_handler.add_data_csv(last_input_data, csv_path)
-    csv_handler.read_csv_data(csv_path)
+    #csv_handler.write_data(input_data, csv_path)
+    #csv_handler.read_csv_data(csv_path)
+    #csv_handler.add_data_csv(last_input_data, csv_path)
+    netflix_csv = Path("../input/netflix_titles.csv")
+    csv_handler.read_csv_data(netflix_csv)

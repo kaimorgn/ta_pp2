@@ -8,8 +8,8 @@
 # Pythonスクリプト．
 #
 
-#from features.read_yml import read_yml
-from read_yml import read_yml
+from features.read_yml import read_yml
+#from read_yml import read_yml
 
 import logging
 from logging import getLogger, basicConfig
