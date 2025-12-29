@@ -57,10 +57,13 @@ class DateTimeManager:
         JDatetime 型の日付データに時間データを追加するメソッド
         '''
         assert input_date, "日付データを渡して"
-        assert isinstance(input_date, JDatetime), "日付データは JDatetime 型"
         assert moment, "追加する時間データを渡して"
         assert isinstance(moment, str), "追加する時間は文字列型にして"
 
+        if isinstance(input_date, str):
+            logger.debug(f"> 入力された日付を JDatetime 型へ変換する")
+            input_date = self.convert_dtformat(input_date)
+        
         try:
             parts = list(
                 map(
@@ -213,13 +216,13 @@ if __name__ == "__main__":
     logger.debug(f"> datetime型への変換結果: {converted_date}")
 
     moment = "21:00"
-    converted_datetime = datetime_manager.add_time(converted_date, moment)
+    converted_datetime = datetime_manager.add_time(input_date, moment)
     logger.debug(
         f"> 時間データの追加結果{converted_datetime}"
     )
 
     converted_iso_datetime = datetime_manager.convert_isoformat(
-        converted_datetime, moment
+        input_date, moment
     )
     logger.debug(
         f"> ISO 形式に変換した結果: {converted_iso_datetime}"

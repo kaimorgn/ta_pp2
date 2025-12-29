@@ -3,11 +3,15 @@
 # sync_with_google_calendar.py
 #
 # [概要]
-#
-#
-#
-#
-#
+# Google Calendar API と連携して
+# 特定の日時の予定(イベント)を取得したり
+# 追加したりするプログラム．
+# 
+# まずは手作業でイベントを追加して
+# そのイベント情報を取得する．
+# その後，Python を使って
+# 講義最終回の日時に最終発表の予定を
+# 追加する．
 #
 
 from googleapiclient.discovery import build
@@ -43,6 +47,8 @@ class SyncWithGoogleCalendar:
 
     def _creds_refresh(self, token_path, json_path):
         '''
+        [概要]
+        コンストラクタと同時に実行してトークンをリフレッシュするメソッド
         '''
         assert token_path, "token_pathを渡して"
         assert json_path, "json_pathを渡して"
@@ -83,6 +89,9 @@ class SyncWithGoogleCalendar:
         
     def load_event_id(self, event_name, start_iso, end_iso):
         '''
+        [概要]
+        自分のカレンダーから特定のイベント情報を取得するメソッド
+        ＊ 処理を切り分ければリストでまとめて取得するメソッドに発展できる
         '''
         if not self.service:
             logger.error(">>>> サービスが初期化されていないため処理を中止")
@@ -131,6 +140,8 @@ class SyncWithGoogleCalendar:
 
     def add_event(self, summary, location, start_iso, end_iso, ):
         '''
+        [概要]
+        自分のカレンダーに予定を追加するメソッド
         '''
         event = {
             "summary": summary,
@@ -177,8 +188,6 @@ if __name__ == "__main__":
     datetime_manager = DateTimeManager()
     start_date = "2025年12月29日"
     end_date = "2025年12月31日"
-    start_date = datetime_manager.convert_dtformat(start_date)
-    end_date = datetime_manager.convert_dtformat(end_date)
 
     event = "test"
     start_moment = "00:00"
@@ -192,12 +201,11 @@ if __name__ == "__main__":
     calendar.load_event_id(event, start_iso, end_iso)
 
     ###
-    summary = "(試験)Python プログラミング2"
+    summary = "[最終発表会]Python プログラミング2"
     location = "G1-205"
     insert_date = "2026年1月27日"
     insert_start_moment = "14:30"
     insert_end_moment = "16:00"
-    insert_date = datetime_manager.convert_dtformat(insert_date)
     insert_start_iso = datetime_manager.convert_isoformat(
         insert_date, insert_start_moment
     )
