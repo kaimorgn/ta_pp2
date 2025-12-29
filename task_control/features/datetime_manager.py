@@ -48,7 +48,7 @@ class DateTimeManager:
                 break
 
             except ValueError:
-                logger.error("datetime 型への変換時にエラー発生")
+                logger.debug("datetime 型へ変換する前の文字列型チェック中...")
                 continue
 
     def add_time(self, input_date, moment):
