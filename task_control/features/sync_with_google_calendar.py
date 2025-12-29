@@ -65,7 +65,7 @@ class SyncWithGoogleCalendar:
 
             if not creds or not creds.valid:
                 if creds and creds.expired and creds.refresh_token:
-                    creds.refresh(Requests())
+                    creds.refresh(Request())
 
                 else:
                     flow = InstalledAppFlow.from_client_secrets_file(
@@ -138,7 +138,7 @@ class SyncWithGoogleCalendar:
             )
             raise e
 
-    def add_event(self, summary, location, start_iso, end_iso, ):
+    def add_event(self, summary, location, start_iso, end_iso):
         '''
         [概要]
         自分のカレンダーに予定を追加するメソッド

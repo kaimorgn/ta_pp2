@@ -8,16 +8,18 @@
 # Pythonスクリプト．
 #
 
-#from features.read_yml import read_yml
-from read_yml import read_yml
-
 import logging
 from logging import getLogger, basicConfig
 from logging.config import dictConfig
-
 from pathlib import Path
 
+try:
+    from features.read_yml import read_yml
 
+except:
+    from read_yml import read_yml
+
+    
 def setup_logging(config_path: str):
     '''
     [概要]
