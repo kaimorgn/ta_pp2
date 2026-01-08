@@ -90,7 +90,7 @@ if __name__ == "__main__":
     manager = ScheduleManager(token_path, json_path)
 
     search_title = "test"
-    search_date = "2025年12月30日"
+    search_date = "2026年1月20日"
     search_start_moment = "00:00"
     search_end_moment = "23:59"
     manager.search_event_id(
